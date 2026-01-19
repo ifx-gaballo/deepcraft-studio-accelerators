@@ -8,9 +8,9 @@ import requests
 STUDIO_TEMPLATES_DIR = '_studio_templates'
 TOKEN = os.getenv('STARTER_MODELS_PIPELINE_TOKEN')
 
-def start_pipeline(owner: str, repo: str, branch: str, is_pr: bool) -> None:
+def start_pipeline(pr_number: str = '') -> None:
     print('Collect all projects that have changes')
-    if is_pr:
+    if pr_number:
         git_diff_range = 'origin/main'
     else:
         git_diff_range = 'HEAD~1'
@@ -42,8 +42,7 @@ def start_pipeline(owner: str, repo: str, branch: str, is_pr: bool) -> None:
                 'target': {
                     'type': 'pipeline_ref_target',
                     'ref_type': 'branch',
-                    # TODO: Set ref_name back to main before merging
-                    'ref_name': 'feature/SD-5322-move-templates-to-accelerators',
+                    'ref_name': 'master',
                     'selector': {
                         'type': 'custom',
                         'pattern': 'update-project',
@@ -53,12 +52,9 @@ def start_pipeline(owner: str, repo: str, branch: str, is_pr: bool) -> None:
                     {
                         'key': 'PIPELINE',
                         'value': json.dumps({
-                            'repo_owner': owner,
-                            'repo_name': repo,
-                            'branch': branch,
+                            'pr_number': pr_number,
                             'project_name': project_name,
                             'root_path': STUDIO_TEMPLATES_DIR if is_template else '',
-                            'is_pr': is_pr,
                         }),
                     },
                 ],
@@ -73,21 +69,8 @@ def main():
         description='Start pipeline for changed projects in the repository'
     )
     parser.add_argument(
-        '--owner',
-        help='Repository owner',
-    )
-    parser.add_argument(
-        '--repo',
-        help='Repository name',
-    )
-    parser.add_argument(
-        '--branch',
-        help='Branch name to compare for changes',
-    )
-    parser.add_argument(
-        '--is-pr',
-        action='store_true',
-        help='Whether this is a pull request',
+        '--pr-number',
+        help='Pull request number',
     )
     start_pipeline(**vars(parser.parse_args()))
 
