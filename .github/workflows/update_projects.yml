@@ -24,8 +24,6 @@ jobs:
       id-token: write   # This is required for requesting the JWT
       contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: Build changed projects
         uses: ./.github/actions/update_projects
         with:
@@ -44,8 +42,6 @@ jobs:
       id-token: write   # This is required for requesting the JWT
       contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: Build and deploy(if needed) changed projects
         uses: ./.github/actions/update_projects
         with:
