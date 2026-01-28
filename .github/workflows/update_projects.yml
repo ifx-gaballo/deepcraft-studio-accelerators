@@ -14,7 +14,7 @@ on:
         description: 'PR Number (leave empty for main branch)'
 
 jobs:
-  start_pipeline_build:
+  build:
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'pull_request_review' && 
@@ -56,7 +56,7 @@ jobs:
           PR_NUMBER="${{ github.event.pull_request.number }}"
           update-changes --pr-number "$PR_NUMBER"
 
-  start_pipeline_deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
     if: |  # Only triggers that might require updating the repository
       (github.event_name == 'pull_request_review' && 
