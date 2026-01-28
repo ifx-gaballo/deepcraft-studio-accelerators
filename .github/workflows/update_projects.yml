@@ -1,0 +1,50 @@
+name: Update Changed Projects
+
+on:
+  pull_request_review:
+    types: [submitted]  # Trigger on PR review submission
+  pull_request_target:
+    types: [synchronize]
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR Number (leave empty for main branch)'
+
+jobs:
+  start_pipeline_build:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request_review' && 
+       github.event.review.state == 'changes_requested') ||
+      github.event_name == 'pull_request_target'
+    permissions:
+      id-token: write   # This is required for requesting the JWT
+      contents: read
+    steps:
+      - name: Build changed projects
+        uses: ./.github/actions/update_projects
+        with:
+          pr_number: ${{ github.event.pull_request.number }}
+          starter_projects_key: ${{ secrets.STARTER_PROJECTS_READ_ONLY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  start_pipeline_deploy:
+    runs-on: ubuntu-latest
+    if: |  # Only triggers that might require updating the repository
+      (github.event_name == 'pull_request_review' && 
+       github.event.review.state == 'approved') ||
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch'
+    permissions:
+      id-token: write   # This is required for requesting the JWT
+      contents: write
+    steps:
+      - name: Build and deploy(if needed) changed projects
+        uses: ./.github/actions/update_projects
+        with:
+          pr_number: ${{ steps.pr_number.outputs.pr_number }}
+          starter_projects_key: ${{ secrets.STARTER_PROJECTS_READ_ONLY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
