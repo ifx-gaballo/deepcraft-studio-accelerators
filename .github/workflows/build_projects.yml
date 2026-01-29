@@ -29,12 +29,21 @@ jobs:
               --json databaseId `
               --jq '.[].databaseId' `
               --repo ${{ github.repository }}
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "Failed to list workflow runs"
+              exit 1
+            }
             
             $PREVIOUS_DISPATCH = $false
             foreach ($run_id in $RUN_IDS -split "`n") {
-              $RUN_DETAILS = gh api "/repos/{owner}/{repo}/actions/runs/$run_id" --jq '.inputs.pr_number'
-              if ($RUN_DETAILS -eq "${{ github.event.pull_request.number }}") {
+              if ([string]::IsNullOrWhiteSpace($run_id)) { continue }
+              
+              $RUN_PR_NUMBER = gh api "/repos/{owner}/{repo}/actions/runs/$run_id" --jq '.inputs.pr_number'
+              Write-Host "Found workflow_dispatch run $run_id with PR number: $RUN_PR_NUMBER"
+              
+              if ($RUN_PR_NUMBER -eq "${{ github.event.pull_request.number }}") {
                 $PREVIOUS_DISPATCH = $true
+                break
               }
             }
 
