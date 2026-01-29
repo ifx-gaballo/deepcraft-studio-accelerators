@@ -12,13 +12,18 @@ on:
     inputs:
       pr_number:
         description: 'PR Number (leave empty for main branch)'
+      merge_pr:
+        description: 'Merge the PR'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'pull_request_review' && 
-       github.event.review.state == 'changes_requested') ||
+      (github.event_name == 'workflow_dispatch' && 
+       github.event.inputs.merge_pr == 'false') ||
       github.event_name == 'pull_request_target'
     permissions:
       id-token: write   # This is required for requesting the JWT
@@ -59,11 +64,10 @@ jobs:
 
   build_and_deploy:
     runs-on: ubuntu-latest
-    if: |  # Only triggers that might require updating the repository
-      (github.event_name == 'pull_request_review' && 
-       github.event.review.state == 'approved') ||
-      github.event_name == 'push' ||
-      github.event_name == 'workflow_dispatch'
+    if: |  # Only triggers that require updating the repository
+      (github.event_name == 'workflow_dispatch' && 
+       github.event.inputs.merge_pr  == 'true') ||
+      github.event_name == 'push'
     permissions:
       id-token: write   # This is required for requesting the JWT
       contents: write
