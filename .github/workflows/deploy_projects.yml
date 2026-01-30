@@ -40,7 +40,8 @@ jobs:
       - name: Install Pipeline Package
         shell: pwsh
         run: |
-          pip install https://x-token-auth:${{ secrets.STARTER_PROJECTS_READ_ONLY }}@bitbucket.org/imagimob/_starter-projects-pipeline.git
+          git clone https://x-token-auth:${{ secrets.STARTER_MODELS_PIPELINE_TOKEN }}@bitbucket.org/imagimob/_starter-projects-pipeline.git
+          pip install -e _starter-projects-pipeline
 
       - name: Build and deploy (if needed) changed projects
         shell: pwsh
