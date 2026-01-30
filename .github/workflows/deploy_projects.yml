@@ -41,9 +41,11 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path $HOME\.ssh | Out-Null
-          "${{ secrets.STARTER_PROJECTS_READ_ONLY }}" | Out-File -FilePath $HOME\.ssh\id_ed25519 -Encoding utf8
-          icacls "$HOME\.ssh\id_ed25519" /inheritance:r /grant "${env:USERNAME}:(R)"
+          "${{ secrets.STARTER_PROJECTS_READ_ONLY }}" | Out-File -FilePath $HOME\.ssh\id_ed25519_bitbucket -Encoding utf8
+          icacls "$HOME\.ssh\id_ed25519_bitbucket" /inheritance:r /grant "${env:USERNAME}:(R)"
           ssh-keyscan bitbucket.org | Out-File -FilePath $HOME\.ssh\known_hosts -Encoding utf8 -Append
+          $env:GIT_SSH_COMMAND = "ssh -i `"$HOME\.ssh\id_ed25519_bitbucket`" -o IdentitiesOnly=yes"
+          "GIT_SSH_COMMAND=$env:GIT_SSH_COMMAND" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           pip install git+ssh://git@bitbucket.org/imagimob/_starter-projects-pipeline.git
 
       - name: Build and deploy (if needed) changed projects
