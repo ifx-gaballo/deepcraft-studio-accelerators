@@ -57,6 +57,7 @@ jobs:
           Set-Content -Path $HOME\.ssh\id_ed25519 -Value "${{ secrets.STARTER_PROJECTS_READ_ONLY }}" -NoNewline -Encoding utf8
           icacls "$HOME\.ssh\id_ed25519" /inheritance:r /grant "${env:USERNAME}:(R)"
           ssh-keyscan bitbucket.org | Out-File -FilePath $HOME\.ssh\known_hosts -Encoding utf8 -Append
+          git config --global core.sshCommand C:\Windows\System32\OpenSSH\ssh.exe
           pip install git+ssh://git@bitbucket.org/imagimob/_starter-projects-pipeline.git
 
       - name: Build changed projects
