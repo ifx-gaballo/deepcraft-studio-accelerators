@@ -1,4 +1,4 @@
-name: Build and Deploy Project from main Post Training
+name: main - Update All Projects
 
 permissions:
   id-token: write
@@ -6,7 +6,7 @@ permissions:
 
 on:
   repository_dispatch:
-    types: [deploy_main_project]
+    types: [build_all]
 
 jobs:
   deploy:
@@ -23,4 +23,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          update-project --rel-path "${{ github.event.client_payload.project_name }}" 
+          update-all

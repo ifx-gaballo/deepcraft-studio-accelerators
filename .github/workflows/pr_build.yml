@@ -1,4 +1,4 @@
-name: Build Changed Projects from PR
+name: PR - Build Changed Projects
 run-name: ${{ github.event.inputs.pr_number }}
 
 permissions:
