@@ -1,5 +1,11 @@
 name: PR - Build Changed Projects
-run-name: ${{ github.event.inputs.pr_number }}
+run-name: >
+  ${{
+    github.event_name == 'workflow_dispatch' && github.event.inputs.pr_number ||
+    github.event_name == 'pull_request_target' && github.event.pull_request.number ||
+    github.event_name == 'repository_dispatch' && github.event.client_payload.pr_number ||
+    'unknown event'
+  }}
 
 permissions:
   id-token: write
@@ -46,9 +52,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ("${{ github.event_name }}" -eq "pull_request_target") {
-            $PR_NUMBER = "${{ github.event.pull_request.number }}"
-          } else {
+          $JOB_ID = ""
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
             $PR_NUMBER = "${{ github.event.inputs.pr_number }}"
+          } elif ("${{ github.event_name }}" -eq "pull_request_target") {
+            $PR_NUMBER = "${{ github.event.pull_request.number }}"
+          } elif ("${{ github.event_name }}" -eq "repository_dispatch") {
+            $PR_NUMBER = "${{ github.event.client_payload.pr_number }}"
+            $JOB_ID = "--job-id ${{ github.event.client_payload.job_id }}"
+          } else {
+            throw "Unsupported event: ${{ github.event_name }}"
           }
-          update-changes --pr-number "$PR_NUMBER"
+          update-changes --pr-number "$PR_NUMBER" $JOB_ID
