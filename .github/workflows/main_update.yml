@@ -43,7 +43,7 @@ jobs:
             } else {
               throw "Unsupported event: ${{ github.event.event_type }}"
             }
-          } elif (${{ github.event_name }} -eq "push") {
+          } elif ("${{ github.event_name }}" -eq "push") {
             update-changes
           } else {
             throw "Unsupported event: ${{ github.event_name }}"
