@@ -1,9 +1,8 @@
 name: main - Update Projects
 run-name: >
   ${{
-    github.event_name == 'repository_dispatch' && (
-      github.event.event_type == 'main_update_all' && 'main all' ||
-      github.event.event_type == 'main_update_post' && github.event.client_payload.rel_path) ||
+    github.event.event_type == 'main_update_all' && 'main all' ||
+    github.event.event_type == 'main_update_post' && github.event.client_payload.rel_path ||
     'main push'
   }}
 
@@ -35,15 +34,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ("${{ github.event_name }}" -eq "repository_dispatch") {
-            if ("${{ github.event.event_type }}" -eq "main_update_all") {
-              update-all
-            } elif ("${{ github.event.event_type }}" -eq "main_update_post") {
-              update-project --rel-path "${{ github.event.client_payload.rel_path }}" --job-id "${{ github.event.client_payload.job_id }}"
-            } else {
-              throw "Unsupported event: ${{ github.event.event_type }}"
-            }
-          } elif ("${{ github.event_name }}" -eq "push") {
+          if ("${{ github.event.event_type }}" -eq "main_update_all") {
+            update-all
+          } elseif ("${{ github.event.event_type }}" -eq "main_update_post") {
+            update-project --rel-path "${{ github.event.client_payload.rel_path }}" --job-id "${{ github.event.client_payload.job_id }}"
+          } elseif ("${{ github.event_name }}" -eq "push") {
             update-changes
           } else {
             throw "Unsupported event: ${{ github.event_name }}"
