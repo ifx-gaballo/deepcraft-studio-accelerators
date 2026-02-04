@@ -1,9 +1,9 @@
 name: main - Update Projects
 run-name: >
   ${{
-    github.event.event_type == 'main_update_all' && 'main all' ||
+    github.event.event_type == 'main_update_all' && 'All Projects' ||
     github.event.event_type == 'main_update_post' && github.event.client_payload.rel_path ||
-    'main push'
+    ''
   }}
 
 permissions:
