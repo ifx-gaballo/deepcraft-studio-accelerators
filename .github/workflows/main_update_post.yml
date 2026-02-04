@@ -1,5 +1,5 @@
 name: main - Update Project, Post Training
-run-name: ${{ github.event.client_payload.project_name }}
+run-name: ${{ github.event.client_payload.rel_path }}
 
 permissions:
   id-token: write
@@ -24,4 +24,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          update-project --rel-path "${{ github.event.client_payload.project_name }}" --job-id "${{ github.event.client_payload.job_id }}"
+          update-project --rel-path "${{ github.event.client_payload.rel_path }}" --job-id "${{ github.event.client_payload.job_id }}"
