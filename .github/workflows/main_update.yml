@@ -1,8 +1,8 @@
 name: main - Update Projects
 run-name: >
   ${{
-    github.event.event_type == 'main_update_all' && 'All Projects' ||
-    github.event.event_type == 'main_update_post' && github.event.client_payload.rel_path ||
+    github.event.action == 'main_update_all' && 'All Projects' ||
+    github.event.action == 'main_update_post' && github.event.client_payload.rel_path ||
     ''
   }}
 
