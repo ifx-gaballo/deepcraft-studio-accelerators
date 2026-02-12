@@ -15,7 +15,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: windows-11-arm
+    runs-on: windows-2025
     steps:
       - name: Install Pipeline Package
         shell: pwsh
